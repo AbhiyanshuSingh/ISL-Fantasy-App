@@ -8,19 +8,20 @@ import os
 import streamlit.components.v1 as components
 import plotly.graph_objects as go
 from urllib.parse import urlparse, parse_qs
+from config import get_database_connection
 
 
 # Constants for file paths
 LOGO_DIR = "team_logos"  # Directory containing team logos
 
-# Database Configuration
-def get_database_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="root",
-        database="fantasy_appc"
-    )
+# # Database Configuration
+# def get_database_connection():
+#     return mysql.connector.connect(
+#         host="localhost",
+#         user="root",
+#         password="root",
+#         database="fantasy_appc"
+#     )
 
 # Initialize database tables
 def init_db():
