@@ -9,7 +9,7 @@ import streamlit.components.v1 as components
 import plotly.graph_objects as go
 from urllib.parse import urlparse, parse_qs
 from config import get_database_connection
-
+from pymysql.cursors import DictCursor
 
 # Constants for file paths
 LOGO_DIR = "team_logos"  # Directory containing team logos
@@ -146,7 +146,7 @@ def register_user(username, password):
 
 def login_user(username, password):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     hashed_pw = hash_password(password)
     cursor.execute(
@@ -161,7 +161,7 @@ def login_user(username, password):
 
 def get_leaderboard():
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT username, points
@@ -177,7 +177,7 @@ def get_leaderboard():
 
 def get_popular_players():
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     # Get most selected players
     cursor.execute("""
@@ -234,7 +234,7 @@ def setup_admin():
 
 def get_top_scoring_players():
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT 
@@ -298,7 +298,7 @@ def add_dashboard_visualizations():
 
 def get_user_points_history(user_id):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT 
@@ -319,7 +319,7 @@ def get_user_points_history(user_id):
 
 def get_team_composition_stats(user_id):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT 
@@ -344,7 +344,7 @@ def get_team_composition_stats(user_id):
 
 def get_position_points_distribution(user_id):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT 
@@ -365,7 +365,7 @@ def get_position_points_distribution(user_id):
 
 def get_upcoming_matches():
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT *
@@ -398,7 +398,7 @@ def get_youtube_id(url):
 # Add these new functions
 def get_available_players(position):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT * FROM players 
@@ -416,7 +416,7 @@ def get_available_players(position):
 
 def get_player_by_id(player_id):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     cursor.execute("SELECT * FROM players WHERE id = %s", (player_id,))
     player = cursor.fetchone()
     cursor.close()
@@ -428,7 +428,7 @@ def get_player_by_id(player_id):
 # Add these new functions for squad management
 def get_current_squad_lock(user_id):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT locked_until 
@@ -482,7 +482,7 @@ def save_squad_history(user_id, selected_players):
 def update_user_points():
     """Update points for all users based on their current squad's performance"""
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     try:
         # Get all users with their latest squad
@@ -594,7 +594,7 @@ def get_all_players_with_stats():
     Get all players with their performance statistics
     """
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT p.*,
@@ -683,7 +683,7 @@ def suggest_team(budget=100.0):
 
 def get_user_squad_history(user_id):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT sh.*, 
@@ -769,7 +769,7 @@ def save_user_team(user_id, selected_players):
 def is_admin(username):
     """Check if the user is an admin"""
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     try:
         cursor.execute("""
@@ -790,7 +790,7 @@ def is_admin(username):
 def get_matches_for_date(date):
     """Get all matches scheduled for a specific date"""
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT id, home_team, away_team, match_time
@@ -807,7 +807,7 @@ def get_matches_for_date(date):
 def get_team_players(team):
     """Get all players from a specific team"""
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT id, name, position
@@ -937,7 +937,7 @@ def show_sidebar_navigation():
 def get_match_highlights():
     """Get match highlights from database"""
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS match_highlights (
@@ -1327,7 +1327,7 @@ def show_create_team():
 def display_locked_squad():
     # Get the most recent squad
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(DictCursor)
     
     cursor.execute("""
         SELECT p.*, sp.position_order
