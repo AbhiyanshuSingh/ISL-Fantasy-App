@@ -1490,7 +1490,7 @@ def show_admin_page():
         return
     
     # Add tabs for different admin functions
-    admin_tabs = st.tabs(["Match Points", "Highlights Management"])
+    admin_tabs = st.tabs(["Match Points", "Highlights Management","Upcoming Matches"])
 
     with admin_tabs[0]:
         # Your existing match points code
@@ -1658,6 +1658,38 @@ def show_admin_page():
 
     with admin_tabs[1]:
         show_highlights_management()
+
+    with admin_tabs[2]:
+        st.subheader("Add Upcoming Match")
+        isl_teams = ["Mohun Bagan Super Giants", "Bengaluru FC", "Chennaiyin FC", "East Bengal FC", "FC Goa", "Hyderabad FC", "Jamshedpur FC", "Kerala Blasters FC", "Mumbai City FC", "NorthEast United FC", "Odisha FC", "Punjab FC"]
+        with st.form("upcoming_match_form"):
+            home_team = st.selectbox("Home Team", isl_teams)
+            away_team = st.selectbox("Away Team", [team for team in isl_teams if team != home_team])
+            match_date = st.date_input("Match Date")
+            match_time = st.time_input("Match Time")
+            status = "upcoming"
+            submit_match = st.form_submit_button("Add Match")
+            
+            if submit_match:
+                try:
+                    conn = get_database_connection()
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT MAX(id) FROM matches")
+                    max_id = cursor.fetchone()[0] or 35
+                    new_id = max_id + 1
+                    
+                    query = """
+                        INSERT INTO matches (id, home_team, away_team, match_time, home_logo, away_logo, status, home_score, away_score)
+                        VALUES (%s, %s, %s, %s, NULL, NULL, %s, NULL, NULL)
+                    """
+                    cursor.execute(query, (new_id, home_team, away_team, f"{match_date} {match_time}", status))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                    
+                    st.success("Upcoming match added successfully!")
+                except Exception as e:
+                    st.error(f"Error adding match: {str(e)}")
     
 
 # Session state initialization
